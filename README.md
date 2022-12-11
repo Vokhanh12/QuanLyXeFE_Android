@@ -1,5 +1,37 @@
-Learn how to consume an API using Retrofit with Jetpack Compose.
+# Consume API Jetpack Compose Tutorial
 
-Tutorial on YouTube: https://youtu.be/e2tvVJtfGQM
+An app that consumes a gaming API and returns a list of games built with Jetpack Compose, a modern UI toolkit for building native Android apps. The app allows users to easily browse and discover new games to play.
 
-[![Watch the video](https://pbs.twimg.com/media/FhlAZltXwAACFwP?format=jpg&name=large)](https://youtu.be/e2tvVJtfGQM)
+## Libraries
+
+- Retrofit2
+- Coil
+- ViewModel
+- Dagger Hilt
+
+## Features
+
+- Show a list of games
+
+
+## API Reference
+
+#### Live games list
+
+```http
+  GET https://www.freetogame.com/api/games
+```
+
+| Base Url                          | Parameter     | Type                       |
+| :-------------------------------- | :------------ | :------------------------- |
+| `https://www.freetogame.com/api/` | `games`       | `string`                   |
+
+## Documentation
+
+[Documentation](https://www.freetogame.com/api-doc)
+
+## Tutorial on YouTube
+
+[Tutorial on YouTube](https://youtu.be/e2tvVJtfGQM)
+
+![App Screenshot](https://pbs.twimg.com/media/FhlAZltXwAACFwP?format=jpg&name=large)
