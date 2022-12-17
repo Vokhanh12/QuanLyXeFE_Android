@@ -34,4 +34,4 @@ An app that consumes a gaming API and returns a list of games built with Jetpack
 
 [Tutorial on YouTube](https://youtu.be/e2tvVJtfGQM)
 
-![App Screenshot](https://pbs.twimg.com/media/FhlAZltXwAACFwP?format=jpg&name=large)
+![App Screenshot](https://pbs.twimg.com/media/FkN2r7bWYAAwZP_?format=jpg&name=large)
