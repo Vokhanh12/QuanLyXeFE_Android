@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 class GameService @Inject constructor(private val gameApi: GameApi) {
 
+    /*
     suspend fun getGames(): List<GameModel> {
 
         return withContext(Dispatchers.IO) {
@@ -19,5 +20,7 @@ class GameService @Inject constructor(private val gameApi: GameApi) {
         }
 
     }
+
+     */
 
 }

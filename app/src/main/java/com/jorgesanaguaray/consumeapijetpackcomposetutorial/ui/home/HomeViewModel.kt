@@ -3,7 +3,9 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetGamesUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +17,9 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getGamesUseCase: GetGamesUseCase) : ViewModel() {
+class HomeViewModel @Inject constructor(private val getVehiclesUseCase: GetVehiclesUseCase) : ViewModel() {
+
+    /*
 
     private val _games = MutableStateFlow(emptyList<GameItem>())
     val games: StateFlow<List<GameItem>> get() = _games
@@ -32,6 +36,31 @@ class HomeViewModel @Inject constructor(private val getGamesUseCase: GetGamesUse
 
                 val games = getGamesUseCase()
                 _games.value = games
+
+            } catch (_: Exception) {}
+
+        }
+
+    }
+
+     */
+
+    private val _vehicles = MutableStateFlow(emptyList<VehicleItem>())
+    val vehicles: StateFlow<List<VehicleItem>> get() = _vehicles
+
+    init {
+        println("ViewModel Initialized")
+        getVehicles()
+    }
+
+    private fun getVehicles() {
+
+        viewModelScope.launch {
+
+            try {
+
+                val vehicles = getVehiclesUseCase()
+                _vehicles.value = vehicles
 
             } catch (_: Exception) {}
 

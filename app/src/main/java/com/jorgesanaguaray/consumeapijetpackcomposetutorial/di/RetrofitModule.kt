@@ -1,6 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.di
 
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.GameApi
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -29,10 +29,11 @@ object RetrofitModule {
 
     }
 
+
     @Singleton
     @Provides
-    fun provideGameApi(retrofit: Retrofit): GameApi {
-        return retrofit.create(GameApi::class.java)
+    fun provideVehicleApi(retrofit: Retrofit): VehicleApi {
+        return retrofit.create(VehicleApi::class.java)
     }
 
 }

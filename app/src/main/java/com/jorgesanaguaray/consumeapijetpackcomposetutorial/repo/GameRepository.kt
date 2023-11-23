@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 class GameRepository @Inject constructor(private val gameService: GameService) {
 
+    /*
     suspend fun getGames(): List<GameItem> {
 
         return gameService.getGames().map {
@@ -18,5 +19,7 @@ class GameRepository @Inject constructor(private val gameService: GameService) {
         }
 
     }
+
+     */
 
 }
