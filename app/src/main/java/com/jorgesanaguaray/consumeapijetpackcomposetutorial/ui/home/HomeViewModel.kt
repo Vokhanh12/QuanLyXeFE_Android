@@ -2,9 +2,7 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetGamesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

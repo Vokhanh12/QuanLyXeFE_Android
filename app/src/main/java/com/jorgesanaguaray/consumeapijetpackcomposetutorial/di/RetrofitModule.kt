@@ -1,6 +1,8 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.di
 
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleApi
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -29,11 +31,17 @@ object RetrofitModule {
 
     }
 
-
     @Singleton
     @Provides
     fun provideVehicleApi(retrofit: Retrofit): VehicleApi {
         return retrofit.create(VehicleApi::class.java)
+    }
+
+
+    @Singleton
+    @Provides
+    fun provideHomeViewModelFactory(getVehiclesUseCase: GetVehiclesUseCase): HomeViewModelFactory {
+        return HomeViewModelFactory(getVehiclesUseCase)
     }
 
 }

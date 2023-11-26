@@ -41,9 +41,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach{
+        kotlinOptions{
+            freeCompilerArgs +=["-Xjvm-default=all",]
+            jvmTarget = '1.8'
+
+        }
     }
+
 
     buildFeatures {
         compose true
@@ -78,6 +83,7 @@ dependencies {
 
     // ViewModel
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
 
     // Dagger Hilt
@@ -91,5 +97,18 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+
+    // Navigation
+
+
+    implementation("androidx.navigation:navigation-compose:2.5.3")
+
+    // Material 3
+    implementation("androidx.compose.material3:material3:1.0.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
+
+
+
+
 
 }

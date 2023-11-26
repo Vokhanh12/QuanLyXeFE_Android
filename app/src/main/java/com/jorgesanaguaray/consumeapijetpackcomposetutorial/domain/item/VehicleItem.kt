@@ -4,11 +4,11 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.Ve
 
 data class VehicleItem(
     val id: String,
-    val vehicleId: String,
-    val vehicleName: String,
-    val vehicleType: String,
+    val code: String,
+    val name: String,
+    val type: String,
     val startYearOfUse: String,
     val urlImage: String
 )
 
-fun VehicleModel.toVehicleItem() = VehicleItem(id , vehicleId, vehicleName, vehicleType, startYearOfUse, urlImage)
+fun VehicleModel.toVehicleItem() = VehicleItem(id , code, name, type, startYearOfUse, urlImage)
