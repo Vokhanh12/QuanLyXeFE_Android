@@ -4,6 +4,7 @@ import android.util.Log
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 class VerhicleService @Inject constructor(private val vehicleApi: VehicleApi) {
@@ -18,6 +19,18 @@ class VerhicleService @Inject constructor(private val vehicleApi: VehicleApi) {
             } catch (e: Exception) {
                 Log.e("API_ERROR", "Error fetching vehicles", e)
                 emptyList()
+            }
+        }
+    }
+
+    suspend fun deleteVehicleById(vehicleId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: Response<Unit> = vehicleApi.deleteVehicleById(vehicleId)
+                return@withContext response.isSuccessful
+            } catch (e: Exception) {
+                Log.e("API_ERROR", "Error deleting vehicle", e)
+                return@withContext false
             }
         }
     }

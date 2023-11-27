@@ -118,10 +118,7 @@ fun ScreenForManager(){
                     label = { Text(text = "Lịch sử cho thuê") },
                     selected = false,
                     onClick = { /*TODO*/ },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedLabelColor = Color.Blue, // Set unselected label color to blue
-                        unselectedBackgroundColor = Color.Transparent // Optional: Set unselected background color
-                    )
+
                 )
 
                 // ...other drawer items

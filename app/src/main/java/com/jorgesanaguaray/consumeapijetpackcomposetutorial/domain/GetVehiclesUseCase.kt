@@ -10,4 +10,9 @@ class GetVehiclesUseCase @Inject constructor(private val vehicleRepository: Vehi
         return vehicleRepository.getVehicles().shuffled()
     }
 
+    suspend fun deleteVehicleById(vehicleId: String): Boolean {
+        // Delegate the deletion logic to the repository
+        return vehicleRepository.deleteVehicleById(vehicleId)
+    }
+
 }

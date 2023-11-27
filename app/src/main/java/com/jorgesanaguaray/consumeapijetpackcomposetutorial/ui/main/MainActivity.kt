@@ -1,7 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.main
 
 import android.os.Bundle
-import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,9 +17,11 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.RegisterScre
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.manager.mVehiclesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.ConsumeApiJetpackComposeTutorialTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,8 +47,9 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    Navigation(homeViewModelFactory)
+                    //Navigation(homeViewModelFactory)
 
+                    mVehiclesScreen()
 
                 }
 

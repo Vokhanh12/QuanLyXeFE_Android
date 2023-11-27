@@ -11,4 +11,9 @@ class VehicleRepository @Inject constructor(private val vehicleService: Verhicle
             it.toVehicleItem()
         }
     }
+
+    suspend fun deleteVehicleById(vehicleId: String): Boolean {
+        return vehicleService.deleteVehicleById(vehicleId)
+    }
+
 }
