@@ -13,7 +13,15 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -21,15 +29,21 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemColors
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +51,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Created by Jorge Sanaguaray
@@ -45,6 +61,10 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleI
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
+
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
     /*
 
     val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
@@ -65,17 +85,64 @@ fun HomeScreen() {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
     val screenHeightDp = configuration.screenHeightDp
+    
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+            Box(modifier = Modifier
+                .fillMaxWidth()
+            ){
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = null,
+                    tint = Color.Black, // Icon color
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable {
+                            coroutineScope.launch {
+                                drawerState.open()
+                            }
 
-    ScreenForManager()
+                        } // Make the icon clickable
+                        .padding(8.dp)
+                    // Optional padding
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "Trang chính"
+
+                )
+            }
+
+        }
+    
+        Divider()
+        ScreenForManager(drawerState,coroutineScope)
+        
+    }
+
 
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenForManager(){
+fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
+
+
+    val drawerItemList = prepareNavigationDrawerItems()
+    val selectedItem = remember { mutableStateOf(drawerItemList[0]) }
+
 
     ModalNavigationDrawer(
+        drawerState = drawerState,
 
         drawerContent = {
             ModalDrawerSheet {
@@ -107,19 +174,29 @@ fun ScreenForManager(){
 
                 }
                 Divider()
-                NavigationDrawerItem(
 
-                    label = { Text(text = "Cho thuê") },
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                            colors = NavigationDrawerItemDefaults.colors()
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Lịch sử cho thuê") },
-                    selected = false,
-                    onClick = { /*TODO*/ },
+                drawerItemList.forEach { item ->
+                    NavigationDrawerItem(
 
-                )
+                        icon = { Icon(imageVector = item.icon, contentDescription = null) },
+                        label = { Text(text = "${item.label}") },
+                        selected = false,
+                        onClick = {
+                            coroutineScope.launch {
+                                drawerState.close()
+                            }
+                        },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            selectedIconColor = Color.Red,
+                            unselectedTextColor = Color.Red
+
+                        ),
+
+
+                    )
+                }
+
+
 
                 // ...other drawer items
             }
@@ -327,3 +404,15 @@ fun VehicleCard(vehicle: VehicleItem) {
     }
 
 }
+
+private fun prepareNavigationDrawerItems(): List<NavigationDrawerData> {
+    val drawerItemsList = arrayListOf<NavigationDrawerData>()
+
+    // add items
+    drawerItemsList.add(NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart))
+    drawerItemsList.add(NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Info))
+
+    return drawerItemsList
+}
+
+data class NavigationDrawerData(val label: String, val icon: ImageVector)

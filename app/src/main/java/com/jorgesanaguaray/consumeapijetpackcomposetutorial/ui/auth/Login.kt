@@ -1,5 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -18,14 +20,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.main.Screen
+import kotlinx.coroutines.launch
+import androidx.hilt.navigation.compose.hiltViewModel
+
 
 
 @Composable
@@ -34,7 +41,17 @@ fun LoginScreen(navController: NavController){
     val screenWidthDp = configuration.screenWidthDp
     val screenHeightDp = configuration.screenHeightDp
 
-    var text by remember { mutableStateOf("Hello") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+
+
+    val coroutineScope = rememberCoroutineScope()
+
+
+
+
+
 
     Column(
         modifier = Modifier
@@ -58,9 +75,10 @@ fun LoginScreen(navController: NavController){
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
-            value = text,
-            onValueChange = { text = it },
+            value = username,
+            onValueChange = { username = it },
             label = { Text("Tên tài khoản") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             modifier = Modifier
                 .width(screenWidthDp.dp)
                 .height(75.dp)
@@ -71,9 +89,10 @@ fun LoginScreen(navController: NavController){
         Spacer(modifier = Modifier.height(6.dp))
 
         TextField(
-            value = text,
-            onValueChange = { text = it },
+            value = password,
+            onValueChange = { password = it },
             label = { Text("Mật khẩu") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             modifier = Modifier
                 .width(screenWidthDp.dp)
                 .height(75.dp)
@@ -86,12 +105,22 @@ fun LoginScreen(navController: NavController){
         Row(
 
         ){
+
+            val loginViewModel: LoginViewModel = hiltViewModel()
             Button(
                 onClick = {
+                                       coroutineScope.launch {
+                                         val account = loginViewModel.getTypeByUsernameAndPassword(username = username, password = password)
 
-                    try {
-                        navController.navigate(Screen.Companion.HomeScreen.route)
-                    }catch (ex: Exception){}
+                                           if(account?.type == "NV")
+                                           {
+                                               navController.navigate(Screen.Companion.HomeScreen.route)
+                                           }
+                                           else{
+                                               Log.d("Login","Login failed ${account?.type}. $username .$password")
+                                           }
+
+                                       }
 
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue),

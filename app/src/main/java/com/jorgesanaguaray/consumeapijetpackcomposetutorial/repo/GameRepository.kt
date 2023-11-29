@@ -1,8 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo
 
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.GameService
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.toGameItem
 import javax.inject.Inject
 
 /**

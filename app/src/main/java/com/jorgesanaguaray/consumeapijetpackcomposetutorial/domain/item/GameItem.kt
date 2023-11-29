@@ -5,7 +5,6 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.Ga
 /**
  * Created by Jorge Sanaguaray
  */
-
 data class GameItem(
 
     val id: Int,
@@ -14,5 +13,4 @@ data class GameItem(
     val short_description: String
 
 )
-
 fun GameModel.toGameItem() = GameItem(id, title, thumbnail, short_description)

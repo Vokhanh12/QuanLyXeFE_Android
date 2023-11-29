@@ -5,6 +5,7 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Compa
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface VehicleApi {
@@ -14,5 +15,7 @@ interface VehicleApi {
 
     @DELETE("$VEHICLES_ENDPOINT/{id}")
     suspend fun deleteVehicleById(@Path("id") vehicleId: String): Response<Unit>
+
+
 
 }

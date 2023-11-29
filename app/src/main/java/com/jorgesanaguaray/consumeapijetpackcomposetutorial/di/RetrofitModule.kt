@@ -1,7 +1,10 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.di
 
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.AccountApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.LoginAccountsUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.AccountRepository
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.BASE_URL
 import dagger.Module
@@ -37,11 +40,25 @@ object RetrofitModule {
         return retrofit.create(VehicleApi::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideAccountApi(retrofit: Retrofit): AccountApi {
+        return retrofit.create(AccountApi::class.java)
+    }
+
 
     @Singleton
     @Provides
     fun provideHomeViewModelFactory(getVehiclesUseCase: GetVehiclesUseCase): HomeViewModelFactory {
         return HomeViewModelFactory(getVehiclesUseCase)
     }
+
+
+    @Singleton
+    @Provides
+    fun provideLoginAccountsUseCase(accountRepository: AccountRepository): LoginAccountsUseCase {
+        return LoginAccountsUseCase(accountRepository)
+    }
+
 
 }

@@ -58,6 +58,7 @@ fun mVehiclesScreen(){
         items(vehicles) { vehicle: VehicleItem ->
 
             VehicleCard(vehicle = vehicle, mVehicleViewModel = mVehicleViewModel){
+
             }
 
         }
@@ -112,10 +113,7 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = vehicle.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-
                     Text(text = vehicle.code, overflow = TextOverflow.Ellipsis)
-
-
 
                 }
 
@@ -125,12 +123,12 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = "Loại: " + vehicle.type, maxLines = 2, overflow = TextOverflow.Ellipsis)
-
                     Text(text = "Năm: "+vehicle.startYearOfUse, overflow = TextOverflow.Ellipsis)
 
                     Button(onClick = {
 
                         coroutineScope.launch {
+                            // delete vehicle by ID
                             mVehicleViewModel.deleteVehicleById(vehicle.id.toString())
 
                             Toast.makeText(context, "Xóa thành công ${vehicle.id} ${vehicle.code} ${vehicle.name}", Toast.LENGTH_LONG).show()

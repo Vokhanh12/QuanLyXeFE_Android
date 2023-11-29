@@ -1,7 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item
 
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
-
 data class VehicleItem(
     val id: String,
     val code: String,
@@ -10,5 +9,4 @@ data class VehicleItem(
     val startYearOfUse: String,
     val urlImage: String
 )
-
 fun VehicleModel.toVehicleItem() = VehicleItem(id , code, name, type, startYearOfUse, urlImage)
