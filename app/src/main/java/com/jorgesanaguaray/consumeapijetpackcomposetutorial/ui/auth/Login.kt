@@ -44,14 +44,7 @@ fun LoginScreen(navController: NavController){
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-
-
     val coroutineScope = rememberCoroutineScope()
-
-
-
-
-
 
     Column(
         modifier = Modifier
@@ -109,18 +102,22 @@ fun LoginScreen(navController: NavController){
             val loginViewModel: LoginViewModel = hiltViewModel()
             Button(
                 onClick = {
-                                       coroutineScope.launch {
-                                         val account = loginViewModel.getTypeByUsernameAndPassword(username = username, password = password)
+                    coroutineScope.launch {
+                        val account = loginViewModel.getTypeByUsernameAndPassword(username = username, password = password)
+                        navController.navigate(Screen.Companion.HomeScreen.route + "/${account?.type}")
 
-                                           if(account?.type == "NV")
-                                           {
-                                               navController.navigate(Screen.Companion.HomeScreen.route)
-                                           }
-                                           else{
-                                               Log.d("Login","Login failed ${account?.type}. $username .$password")
-                                           }
 
-                                       }
+                        /*
+
+                        if(account?.type == "NV")
+                            navController.navigate(Screen.Companion.HomeScreen.route)
+                        else{
+                            Log.d("Login","Login failed ${account?.type}. $username .$password")
+                        }
+
+                         */
+
+                    }
 
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue),
@@ -135,9 +132,9 @@ fun LoginScreen(navController: NavController){
 
             Button(
                 onClick = {
-                          try {
-                              navController.navigate(Screen.Companion.RegisterScreen.route)
-                          }catch (ex: Exception){}
+                    try {
+                        navController.navigate(Screen.Companion.RegisterScreen.route)
+                    }catch (ex: Exception){}
                 },
                 modifier = Modifier
                     .width(screenWidthDp.dp / 2.4f)

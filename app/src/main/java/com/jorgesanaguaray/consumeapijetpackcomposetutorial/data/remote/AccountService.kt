@@ -1,7 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote
 
 import android.util.Log
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.AccountModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.AccountItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,7 +18,7 @@ class AccountService @Inject constructor(private val accountApi: AccountApi) {
                 )
 
                 if (response != null) {
-                    Log.d("API_RESPONSEaaaaa", "Raw Response Body: ${response.raw().toString()}")
+                    Log.d("API_RESPONSE", "Raw Response Body: ${response.raw().toString()}")
 
                     if (response.isSuccessful) {
                         // Handle successful response

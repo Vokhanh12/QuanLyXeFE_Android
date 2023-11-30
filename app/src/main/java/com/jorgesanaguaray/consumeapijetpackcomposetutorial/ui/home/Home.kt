@@ -1,5 +1,7 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,13 +15,18 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,7 +68,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(typeForScreen: String) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -122,9 +130,17 @@ fun HomeScreen() {
             }
 
         }
-    
         Divider()
-        ScreenForManager(drawerState,coroutineScope)
+
+        when(typeForScreen)
+        {
+            "NV" -> ScreenForEmployee(drawerState = drawerState, coroutineScope = coroutineScope)
+            "QL" -> ScreenForManager(drawerState = drawerState, coroutineScope = coroutineScope)
+
+            else -> Log.d("HomeScreen","Error line 130 in Home.kt")
+        }
+
+
         
     }
 
@@ -134,10 +150,10 @@ fun HomeScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
+fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope){
 
 
-    val drawerItemList = prepareNavigationDrawerItems()
+    val drawerItemList = prepareNavigationDrawerEmployeeItems()
     val selectedItem = remember { mutableStateOf(drawerItemList[0]) }
 
 
@@ -186,11 +202,6 @@ fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
                                 drawerState.close()
                             }
                         },
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedIconColor = Color.Red,
-                            unselectedTextColor = Color.Red
-
-                        ),
 
 
                     )
@@ -222,11 +233,17 @@ fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenForEmployee(){
+fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
+
+    val drawerItemList = prepareNavigationDrawerManagerItems()
+    val context = LocalContext.current
 
     ModalNavigationDrawer(
+        drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -254,26 +271,48 @@ fun ScreenForEmployee(){
                     }
                 }
                 Divider()
+                drawerItemList.take(drawerItemList.size - 1).forEach { item ->
+                    NavigationDrawerItem(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        icon = { Icon(imageVector = item.second.icon, contentDescription = null) },
+                        label = { Text(text = "${item.second.label}") },
+                        selected = false,
+                        onClick = {
+                            coroutineScope.launch {
+
+                                when(item.first){
+
+                                    1 ->
+
+                                }
+
+                                drawerState.close()
+
+
+                                // Show the index of the clicked item
+
+                            }
+
+                        },
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f)) // Spacer to push Đăng xuất to the end
+
                 NavigationDrawerItem(
-                    label = { Text(text = "Quản lý xe") },
+                    icon = { Icon(imageVector = drawerItemList.last().second.icon, contentDescription = null) },
+                    label = { Text(text = "${drawerItemList.last().second.label}") },
                     selected = false,
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                        coroutineScope.launch {
+                            drawerState.close()
+                            // Show the index of the clicked item
+                        }
+                    },
                 )
-                NavigationDrawerItem(
-                    label = { Text(text = "Quản lý tuyến") },
-                    selected = false,
-                    onClick = { /*TODO*/ }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Quản lý địa điểm") },
-                    selected = false,
-                    onClick = { /*TODO*/ }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Quản lý địa chi tiết tuyến ") },
-                    selected = false,
-                    onClick = { /*TODO*/ }
-                )
+
+
                 // ...other drawer items
             }
         }
@@ -292,6 +331,35 @@ fun ScreenForEmployee(){
 
         }
     }
+
+
+}
+
+
+@Composable
+fun RentScreen(){
+
+}
+
+@Composable
+fun ManagerVehiclesScreen(){
+
+}
+
+@Composable
+fun ManagerRoutesScreen(){
+
+}
+
+
+@Composable
+fun ManagerLocationsScreen(){
+
+}
+
+
+@Composable
+fun HistoryRentScreen(){
 
 
 }
@@ -405,12 +473,30 @@ fun VehicleCard(vehicle: VehicleItem) {
 
 }
 
-private fun prepareNavigationDrawerItems(): List<NavigationDrawerData> {
+private fun prepareNavigationDrawerEmployeeItems(): List<NavigationDrawerData> {
     val drawerItemsList = arrayListOf<NavigationDrawerData>()
 
     // add items
     drawerItemsList.add(NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart))
     drawerItemsList.add(NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Info))
+
+    return drawerItemsList
+}
+
+
+private fun prepareNavigationDrawerManagerItems(): List<Pair<Int,NavigationDrawerData>> {
+    val drawerItemsList = arrayListOf<Pair<Int,NavigationDrawerData>>()
+
+    // add items
+    drawerItemsList.add(0 to NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart))
+    drawerItemsList.add(1 to NavigationDrawerData(label = "Quản lý xe", icon = Icons.Filled.Star))
+    drawerItemsList.add(2 to NavigationDrawerData(label = "Quản lý tuyến", icon = Icons.Filled.Share))
+    drawerItemsList.add(3 to NavigationDrawerData(label = "Quản lý địa điểm", icon = Icons.Filled.LocationOn))
+    drawerItemsList.add(4 to NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Notifications))
+
+
+    drawerItemsList.add(5 to NavigationDrawerData(label = "Đăng xuất", icon = Icons.Filled.Close))
+
 
     return drawerItemsList
 }

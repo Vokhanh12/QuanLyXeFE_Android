@@ -43,9 +43,9 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    Navigation(homeViewModelFactory)
-
-                   // mVehiclesScreen()
+                    //Navigation(homeViewModelFactory)
+                    HomeScreen(typeForScreen = "QL")
+                   //mVehiclesScreen()
 
                 }
 
@@ -66,9 +66,10 @@ fun Navigation(homeViewModelFactory: HomeViewModelFactory){
             LoginScreen(navController)
         }
 
-        composable(Screen.Companion.HomeScreen.route){
+        composable("${Screen.Companion.HomeScreen.route}/{type}"){ backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type") ?: ""
             val viewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
-            HomeScreen()
+            HomeScreen(type)
         }
 
         composable(Screen.Companion.RegisterScreen.route){
@@ -80,13 +81,17 @@ fun Navigation(homeViewModelFactory: HomeViewModelFactory){
 }
 
 
-sealed class Screen(val route: String){
 
-    companion object{
-        object HomeScreen: Screen("home_screen")
-        object LoginScreen: Screen("login_screen")
-        object RegisterScreen: Screen("register_screen")
+sealed class Screen(val route: String) {
+    companion object {
+        object HomeScreen : Screen("home_screen") {
+            object RentScreen : Screen("rent_screen")
+            object ManagerVehicleScreen : Screen("manager_vehicles_screen")
+            object ManagerRouteScreen: Screen("manager_routes_screen")
+            object ManagerLocationsScreen: Screen("manager_loacations_screen")
+            object HistoryRentScreen: Screen("history_rent_screen")
+        }
+        object LoginScreen : Screen("login_screen")
+        object RegisterScreen : Screen("register_screen")
     }
-
 }
-
