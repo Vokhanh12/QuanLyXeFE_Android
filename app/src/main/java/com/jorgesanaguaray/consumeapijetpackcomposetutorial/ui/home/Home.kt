@@ -3,10 +3,12 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
@@ -16,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -43,8 +46,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -59,6 +64,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.main.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -70,8 +77,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(typeForScreen: String) {
 
+    var typeNavMenu by remember { mutableStateOf("navRent") }
+
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+
 
     /*
 
@@ -134,8 +146,8 @@ fun HomeScreen(typeForScreen: String) {
 
         when(typeForScreen)
         {
-            "NV" -> ScreenForEmployee(drawerState = drawerState, coroutineScope = coroutineScope)
-            "QL" -> ScreenForManager(drawerState = drawerState, coroutineScope = coroutineScope)
+            "NV" -> ScreenForEmployee(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
+            "QL" -> ScreenForManager(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
 
             else -> Log.d("HomeScreen","Error line 130 in Home.kt")
         }
@@ -150,11 +162,13 @@ fun HomeScreen(typeForScreen: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope){
+fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope,typeNavMenu : String){
 
+    var currentTypeNavMenu by remember { mutableStateOf(typeNavMenu) }
 
     val drawerItemList = prepareNavigationDrawerEmployeeItems()
     val selectedItem = remember { mutableStateOf(drawerItemList[0]) }
+    val context = LocalContext.current
 
 
     ModalNavigationDrawer(
@@ -191,20 +205,58 @@ fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope){
                 }
                 Divider()
 
-                drawerItemList.forEach { item ->
-                    NavigationDrawerItem(
-
-                        icon = { Icon(imageVector = item.icon, contentDescription = null) },
-                        label = { Text(text = "${item.label}") },
-                        selected = false,
-                        onClick = {
-                            coroutineScope.launch {
-                                drawerState.close()
-                            }
-                        },
-
-
-                    )
+                drawerItemList.take(drawerItemList.size).forEach { item ->
+                    if (item.first < drawerItemList.size - 2) {
+                        NavigationDrawerItem(
+                            icon = {
+                                Icon(
+                                    imageVector = item.second.first.icon,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(text = "${item.second.first.label}") },
+                            selected = false,
+                            onClick = {
+                                coroutineScope.launch {
+                                    drawerState.close()
+                                    when (item.first) {
+                                        in 0..drawerItemList.size -> Toast.makeText(
+                                            context,
+                                            "${item.first}: ${item.second.first.label}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            },
+                        )
+                        if(item.first == drawerItemList.size - 3) Spacer(modifier = Modifier.weight(1f))
+                    } else{
+                        NavigationDrawerItem(
+                            icon = {
+                                Icon(
+                                    imageVector = item.second.first.icon,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(text = "${item.second.first.label}") },
+                            selected = false,
+                            onClick = {
+                                coroutineScope.launch {
+                                    drawerState.close()
+                                    when (item.first) {
+                                        in 0..drawerItemList.size -> {
+                                            Toast.makeText(
+                                            context,
+                                            "${item.first}: ${item.second.first.label}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                            currentTypeNavMenu = item.second.first.toString()
+                                        }
+                                    }
+                                }
+                            },
+                        )
+                    }
                 }
 
 
@@ -213,18 +265,14 @@ fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope){
             }
         }
     ) {
-        // Screen content
-        val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
-        val vehicles by homeViewModel.vehicles.collectAsState()
+        when(currentTypeNavMenu){
+            "navRent" -> RentScreen()
+            "navMVehicle" -> MVehiclesScreen()
+            "navMRoutes" -> ManagerRoutesScreen()
+            "navMLocations" -> ManagerLocationsScreen()
+            "navHistoryRent" -> HistoryRentScreen()
 
-        LazyColumn {
-
-            items(vehicles) { vehicle: VehicleItem ->
-
-                VehicleCard(vehicle = vehicle)
-
-            }
-
+            else -> Toast.makeText(context,"Not found Navigation in Menu",Toast.LENGTH_LONG).show()
         }
     }
 
@@ -233,7 +281,9 @@ fun ScreenForEmployee(drawerState: DrawerState,coroutineScope: CoroutineScope){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
+fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope,  typeNavMenu : String){
+
+    var currentTypeNavMenu by remember { mutableStateOf(typeNavMenu) }
 
     val drawerItemList = prepareNavigationDrawerManagerItems()
     val context = LocalContext.current
@@ -271,74 +321,85 @@ fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope){
                     }
                 }
                 Divider()
-                drawerItemList.take(drawerItemList.size - 1).forEach { item ->
-                    NavigationDrawerItem(
-                        modifier = Modifier
-                            .padding(8.dp),
-                        icon = { Icon(imageVector = item.second.icon, contentDescription = null) },
-                        label = { Text(text = "${item.second.label}") },
-                        selected = false,
-                        onClick = {
-                            coroutineScope.launch {
+                drawerItemList.take(drawerItemList.size).forEach { item ->
+                    if(item.first < drawerItemList.size - 2){
+                        NavigationDrawerItem(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            icon = { Icon(imageVector = item.second.first.icon, contentDescription = null) },
+                            label = { Text(text = "${item.second.first.label}") },
+                            selected = false,
+                            onClick = {
+                                coroutineScope.launch {
 
-                                when(item.first){
-
-                                    1 ->
-
+                                    when(item.first) {
+                                        in 0..drawerItemList.size -> Toast.makeText(
+                                            context,
+                                            "${item.first}: ${item.second.first.label} ${item.second.second}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                    currentTypeNavMenu = item.second.second
+                                    drawerState.close()
+                                    // Show the index of the clicked item
                                 }
 
-                                drawerState.close()
-
-
-                                // Show the index of the clicked item
-
-                            }
-
-                        },
-                    )
+                            },
+                        )
+                        if(item.first == 4)  Spacer(modifier = Modifier.weight(1f)) // Spacer to push Đăng xuất to the end
+                    } else{
+                        NavigationDrawerItem(
+                            icon = { Icon(imageVector = item.second.first.icon, contentDescription = null) },
+                            label = { Text(text = "${item.second.first.label}") },
+                            selected = false,
+                            onClick = {
+                                coroutineScope.launch {
+                                    drawerState.close()
+                                    // Show the index of the clicked item
+                                    when(item.first) {
+                                        in 0..drawerItemList.size -> Toast.makeText(
+                                            context,
+                                            "${item.first}: ${item.second.first.label} ${item.second.second}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                    currentTypeNavMenu = item.second.second
+                                }
+                            },
+                        )
+                    }
                 }
-
-                Spacer(modifier = Modifier.weight(1f)) // Spacer to push Đăng xuất to the end
-
-                NavigationDrawerItem(
-                    icon = { Icon(imageVector = drawerItemList.last().second.icon, contentDescription = null) },
-                    label = { Text(text = "${drawerItemList.last().second.label}") },
-                    selected = false,
-                    onClick = {
-                        coroutineScope.launch {
-                            drawerState.close()
-                            // Show the index of the clicked item
-                        }
-                    },
-                )
-
-
                 // ...other drawer items
             }
         }
     ) {
-        // Screen content
-        val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
-        val vehicles by homeViewModel.vehicles.collectAsState()
+        when(currentTypeNavMenu){
+            "navRent" -> RentScreen()
+            "navMVehicle" -> MVehiclesScreen()
+            "navMRoutes" -> ManagerRoutesScreen()
+            "navMLocations" -> ManagerLocationsScreen()
+            "navHistoryRent" -> HistoryRentScreen()
 
-        LazyColumn {
-
-            items(vehicles) { vehicle: VehicleItem ->
-
-                VehicleCard(vehicle = vehicle)
-
-            }
-
+            else -> Toast.makeText(context,"Not found Navigation in Menu",Toast.LENGTH_LONG).show()
         }
     }
-
-
 }
 
 
 @Composable
 fun RentScreen(){
+    val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
+    val vehicles by homeViewModel.vehicles.collectAsState()
 
+    LazyColumn {
+
+        items(vehicles) { vehicle: VehicleItem ->
+
+            VehicleCard(vehicle = vehicle)
+
+        }
+
+    }
 }
 
 @Composable
@@ -421,14 +482,53 @@ fun VehicleCard(vehicle: VehicleItem) {
 
         Column {
 
-            Image(
-                painter = image,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-            )
+            ) {
+                Image(
+                    painter = image,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                )
+
+                var status: String = "Unknown"
+                when(vehicle.status){
+                    "OFF" -> status = "Trống"
+                    "ON" -> status = "Đã thuê"
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(5.dp)
+                        .size(63.dp, 43.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            if (vehicle.status == "OFF") Color.Red
+                            else
+                                if (vehicle.status == "ON") Color.Green
+                                else Color.Yellow
+                        )
+                ){
+                    Text(
+                        text = status,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+
+                    )
+                }
+
+            }
 
             Column(modifier = Modifier.padding(10.dp)) {
 
@@ -438,10 +538,7 @@ fun VehicleCard(vehicle: VehicleItem) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = vehicle.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-
-                    Text(text = vehicle.code, overflow = TextOverflow.Ellipsis)
-
-
+                    Text(text = vehicle.id, overflow = TextOverflow.Ellipsis)
 
                 }
 
@@ -473,30 +570,34 @@ fun VehicleCard(vehicle: VehicleItem) {
 
 }
 
-private fun prepareNavigationDrawerEmployeeItems(): List<NavigationDrawerData> {
-    val drawerItemsList = arrayListOf<NavigationDrawerData>()
+private fun prepareNavigationDrawerEmployeeItems(): List<Pair<Int,Pair<NavigationDrawerData,String>>> {
+    val typeNavEmployeeOfMenu = arrayOf("navRent","navHistoryRent","navVehRouStats","navLogout")
 
+    val drawerItemsList = arrayListOf<Pair<Int,Pair<NavigationDrawerData,String>>>()
     // add items
-    drawerItemsList.add(NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart))
-    drawerItemsList.add(NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Info))
+    drawerItemsList.add(0 to (NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart) to typeNavEmployeeOfMenu[0]))
+    drawerItemsList.add(1 to (NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Info)to typeNavEmployeeOfMenu[1]))
+    drawerItemsList.add(2 to (NavigationDrawerData(label = "Thống kê", icon = Icons.Filled.DateRange)to typeNavEmployeeOfMenu[2]))
+
+    drawerItemsList.add(3 to (NavigationDrawerData(label = "Đăng xuất", icon = Icons.Filled.Close)to typeNavEmployeeOfMenu[3]))
 
     return drawerItemsList
 }
 
+private fun prepareNavigationDrawerManagerItems(): List<Pair<Int,Pair<NavigationDrawerData,String>>> {
 
-private fun prepareNavigationDrawerManagerItems(): List<Pair<Int,NavigationDrawerData>> {
-    val drawerItemsList = arrayListOf<Pair<Int,NavigationDrawerData>>()
+    val typeNavMangrOfMenu = arrayOf("navRent","navMVehicle","navMRoutes","navMLocations","navHistoryRent","navVehRouStats","navLogout")
 
+    val drawerItemsList = arrayListOf<Pair<Int,Pair<NavigationDrawerData,String>>>()
     // add items
-    drawerItemsList.add(0 to NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart))
-    drawerItemsList.add(1 to NavigationDrawerData(label = "Quản lý xe", icon = Icons.Filled.Star))
-    drawerItemsList.add(2 to NavigationDrawerData(label = "Quản lý tuyến", icon = Icons.Filled.Share))
-    drawerItemsList.add(3 to NavigationDrawerData(label = "Quản lý địa điểm", icon = Icons.Filled.LocationOn))
-    drawerItemsList.add(4 to NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Notifications))
+    drawerItemsList.add(0 to (NavigationDrawerData(label = "Cho thuê", icon = Icons.Filled.ShoppingCart) to typeNavMangrOfMenu[0]))
+    drawerItemsList.add(1 to (NavigationDrawerData(label = "Quản lý xe", icon = Icons.Filled.Star)to typeNavMangrOfMenu[1]))
+    drawerItemsList.add(2 to (NavigationDrawerData(label = "Quản lý tuyến", icon = Icons.Filled.Share)to typeNavMangrOfMenu[2]))
+    drawerItemsList.add(3 to (NavigationDrawerData(label = "Quản lý địa điểm", icon = Icons.Filled.LocationOn)to typeNavMangrOfMenu[3]))
+    drawerItemsList.add(4 to (NavigationDrawerData(label = "Lịch sử cho thuê", icon = Icons.Filled.Notifications)to typeNavMangrOfMenu[4]))
 
-
-    drawerItemsList.add(5 to NavigationDrawerData(label = "Đăng xuất", icon = Icons.Filled.Close))
-
+    drawerItemsList.add(5 to (NavigationDrawerData(label = "Thống kê ", icon = Icons.Filled.DateRange)to typeNavMangrOfMenu[5]))
+    drawerItemsList.add(6 to (NavigationDrawerData(label = "Đăng xuất", icon = Icons.Filled.Close)to typeNavMangrOfMenu[6]))
 
     return drawerItemsList
 }

@@ -1,15 +1,14 @@
-package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.manager
+package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.DeleteVehiclesUseCase
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-class mRoutesViewModel @Inject constructor(private val deleteVehiclesUseCase: DeleteVehiclesUseCase) : ViewModel() {
+@HiltViewModel
+class MVehicleViewModel @Inject constructor(private val deleteVehiclesUseCase: DeleteVehiclesUseCase) : ViewModel() {
     // Example function to delete a vehicle by ID
     suspend fun deleteVehicleById(vehicleId: String): Boolean {
         return deleteVehiclesUseCase.deleteVehicleById(vehicleId)
     }
-
 }

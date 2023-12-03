@@ -1,16 +1,15 @@
-package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.manager
+package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +19,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,15 +40,13 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun mVehiclesScreen(){
+fun MVehiclesScreen(){
 
     // Screen content
     val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
     val vehicles by homeViewModel.vehicles.collectAsState()
 
-    val mVehicleViewModel = viewModel(modelClass = mVehicleViewModel::class.java)
-
-
+    val mVehicleViewModel = viewModel(modelClass = MVehicleViewModel::class.java)
 
 
     LazyColumn {
@@ -72,7 +68,7 @@ fun mVehiclesScreen(){
 
 
 @Composable
-fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDelete: () -> Unit) {
+fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDelete: () -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
     val screenHeightDp = configuration.screenHeightDp
@@ -96,6 +92,7 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
 
         Column {
 
+
             Image(
                 painter = image,
                 contentDescription = null,
@@ -113,7 +110,7 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = vehicle.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text(text = vehicle.code, overflow = TextOverflow.Ellipsis)
+                    Text(text = vehicle.id, overflow = TextOverflow.Ellipsis)
 
                 }
 
@@ -121,7 +118,8 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
                     .padding(10.dp)
                     .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween){
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
                     Text(text = "Loại: " + vehicle.type, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Text(text = "Năm: "+vehicle.startYearOfUse, overflow = TextOverflow.Ellipsis)
 
@@ -131,7 +129,7 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: mVehicleViewModel, onDe
                             // delete vehicle by ID
                             mVehicleViewModel.deleteVehicleById(vehicle.id.toString())
 
-                            Toast.makeText(context, "Xóa thành công ${vehicle.id} ${vehicle.code} ${vehicle.name}", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Xóa thành công ${vehicle.id} ${vehicle.id} ${vehicle.name}", Toast.LENGTH_LONG).show()
                             // Gọi onDelete callback để cập nhật danh sách
                             onDelete()
                         }

@@ -9,7 +9,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 interface AccountApi {
 
-    @POST("http://192.168.1.6:8080/api/login")
+    @POST("http://192.168.1.3:8080/api/login")
     suspend fun getTypeByUsernameAndPassword(
         @Body request: LoginRequest
     ): Response<AccountItem>

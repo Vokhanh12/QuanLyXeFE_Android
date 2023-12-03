@@ -1,4 +1,4 @@
-package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.manager
+package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable

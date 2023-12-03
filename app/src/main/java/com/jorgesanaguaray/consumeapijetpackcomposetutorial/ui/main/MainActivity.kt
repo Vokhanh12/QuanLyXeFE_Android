@@ -17,7 +17,10 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.RegisterScre
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.manager.mVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerLocationsScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerRoutesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MVehiclesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.ConsumeApiJetpackComposeTutorialTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -43,8 +46,7 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    //Navigation(homeViewModelFactory)
-                    HomeScreen(typeForScreen = "QL")
+                    Navigation(homeViewModelFactory)
                    //mVehiclesScreen()
 
                 }
@@ -72,9 +74,7 @@ fun Navigation(homeViewModelFactory: HomeViewModelFactory){
             HomeScreen(type)
         }
 
-        composable(Screen.Companion.RegisterScreen.route){
-            RegisterScreen(navController)
-        }
+
 
     }
 
