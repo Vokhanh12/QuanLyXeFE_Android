@@ -46,8 +46,10 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    Navigation(homeViewModelFactory)
+                    //Navigation(homeViewModelFactory)
+                    HomeScreen(typeForScreen = "QL")
                    //mVehiclesScreen()
+
 
                 }
 
@@ -85,11 +87,7 @@ fun Navigation(homeViewModelFactory: HomeViewModelFactory){
 sealed class Screen(val route: String) {
     companion object {
         object HomeScreen : Screen("home_screen") {
-            object RentScreen : Screen("rent_screen")
-            object ManagerVehicleScreen : Screen("manager_vehicles_screen")
-            object ManagerRouteScreen: Screen("manager_routes_screen")
-            object ManagerLocationsScreen: Screen("manager_loacations_screen")
-            object HistoryRentScreen: Screen("history_rent_screen")
+
         }
         object LoginScreen : Screen("login_screen")
         object RegisterScreen : Screen("register_screen")

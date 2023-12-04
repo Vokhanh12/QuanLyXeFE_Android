@@ -17,6 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -139,18 +141,44 @@ fun HomeScreen(typeForScreen: String) {
                     text = "Trang chính"
 
                 )
+
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = Color.Black, // Icon color
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.CenterEnd)
+                        .clickable {
+                            coroutineScope.launch {
+                                //drawerState.open()
+                            }
+
+                        } // Make the icon clickable
+                        .padding(8.dp)
+                    // Optional padding
+                )
             }
 
         }
         Divider()
 
-        when(typeForScreen)
-        {
-            "NV" -> ScreenForEmployee(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
-            "QL" -> ScreenForManager(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
+        Box(
 
-            else -> Log.d("HomeScreen","Error line 130 in Home.kt")
+        ){
+            when(typeForScreen)
+            {
+                "NV" -> ScreenForEmployee(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
+                "QL" -> ScreenForManager(drawerState = drawerState, coroutineScope = coroutineScope, typeNavMenu)
+
+                else -> Log.d("HomeScreen","Error line 130 in Home.kt")
+            }
+
+
+
         }
+
+
 
 
         

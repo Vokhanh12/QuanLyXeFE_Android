@@ -5,6 +5,7 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleA
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.LoginAccountsUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.AccountRepository
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.VehicleRepository
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.BASE_URL
 import dagger.Module
@@ -58,6 +59,12 @@ object RetrofitModule {
     @Provides
     fun provideLoginAccountsUseCase(accountRepository: AccountRepository): LoginAccountsUseCase {
         return LoginAccountsUseCase(accountRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetVehiclesUseCase(vehicleRepository: VehicleRepository): GetVehiclesUseCase {
+        return GetVehiclesUseCase(vehicleRepository)
     }
 
 

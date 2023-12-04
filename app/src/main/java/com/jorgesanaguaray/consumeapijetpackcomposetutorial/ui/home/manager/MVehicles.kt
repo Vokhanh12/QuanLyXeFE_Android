@@ -2,6 +2,7 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,33 +37,50 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.LoginViewModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun MVehiclesScreen(){
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
 
     // Screen content
     val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
     val vehicles by homeViewModel.vehicles.collectAsState()
 
-    val mVehicleViewModel = viewModel(modelClass = MVehicleViewModel::class.java)
+    val mVehicleViewModel: MVehicleViewModel= hiltViewModel()
 
+    Box(
 
-    LazyColumn {
+    ){
+        LazyColumn {
 
-        items(vehicles) { vehicle: VehicleItem ->
+            items(vehicles) { vehicle: VehicleItem ->
 
-            VehicleCard(vehicle = vehicle, mVehicleViewModel = mVehicleViewModel){
+                VehicleCard(vehicle = vehicle, mVehicleViewModel = mVehicleViewModel){
+
+                }
 
             }
 
         }
+        androidx.compose.material.Button(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .size(screenWidth.dp, 50.dp)
+                .background(Color(android.graphics.Color.parseColor("#eeeee4"))),
+            onClick = { /*TODO*/ }
+        ) {
 
+        }
     }
 
 
@@ -123,7 +145,10 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDe
                     Text(text = "Loại: " + vehicle.type, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Text(text = "Năm: "+vehicle.startYearOfUse, overflow = TextOverflow.Ellipsis)
 
-                    Button(onClick = {
+                    Button(
+                        modifier = Modifier
+                            .size(100.dp,40.dp),
+                        onClick = {
 
                         coroutineScope.launch {
                             // delete vehicle by ID

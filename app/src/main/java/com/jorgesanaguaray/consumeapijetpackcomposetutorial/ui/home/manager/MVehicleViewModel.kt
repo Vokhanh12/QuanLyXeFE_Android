@@ -11,4 +11,5 @@ class MVehicleViewModel @Inject constructor(private val deleteVehiclesUseCase: D
     suspend fun deleteVehicleById(vehicleId: String): Boolean {
         return deleteVehiclesUseCase.deleteVehicleById(vehicleId)
     }
+
 }
