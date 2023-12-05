@@ -7,26 +7,39 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.Icon
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +47,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,8 +56,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.LoginViewModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModel
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.main.Screen
 import kotlinx.coroutines.launch
 
 
@@ -53,13 +68,15 @@ fun MVehiclesScreen(){
     val screenHeight = configuration.screenHeightDp
 
     // Screen content
+    var isShowNotifty by remember { mutableStateOf(false) }
+
     val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
     val vehicles by homeViewModel.vehicles.collectAsState()
 
     val mVehicleViewModel: MVehicleViewModel= hiltViewModel()
 
     Box(
-
+            contentAlignment = Alignment.Center
     ){
         LazyColumn {
 
@@ -77,17 +94,18 @@ fun MVehiclesScreen(){
                 .align(Alignment.BottomCenter)
                 .size(screenWidth.dp, 50.dp)
                 .background(Color(android.graphics.Color.parseColor("#eeeee4"))),
-            onClick = { /*TODO*/ }
+            onClick = { isShowNotifty = true}
         ) {
-
+            Icon(Icons.Filled.Add, "Add")
         }
+
+        if(isShowNotifty){
+            CreateVehicleNotify()
+        }
+
     }
 
-
-
 }
-
-
 
 @Composable
 fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDelete: () -> Unit) {
@@ -177,4 +195,184 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDe
     }
 
 
+}
+
+@Composable
+fun CreateVehicleNotify(){
+    var tfId by remember { mutableStateOf("") }
+    var tfName by remember { mutableStateOf("") }
+
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
+
+
+
+    androidx.compose.material3.Card(
+        modifier = Modifier
+            .size(width = screenWidth.dp - 13.dp, height = screenHeight.dp / 2),
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+
+            ) {
+                Text(
+                    text = "Thêm xe",
+                    modifier = Modifier
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            TextField(
+                value = tfName,
+                onValueChange = { tfName = it },
+                label = { Text("Tên xe") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                modifier = Modifier
+                    .width(screenWidth.dp)
+                    .height((screenHeight / 10).dp)
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            TextField(
+                value = tfId,
+                onValueChange = { tfId = it },
+                label = { Text("Mã xe") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                modifier = Modifier
+                    .width(screenWidth.dp)
+                    .height((screenHeight / 11).dp)
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            Row {
+                TypesDropdownMenuBox()
+                TypesDropdownMenuBox()
+            }
+
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .size(screenWidth.dp,(screenHeight/14).dp)
+                    .padding(0.dp,10.dp,0.dp,0.dp)
+            ) {
+                Text("Thêm",color = Color.White)
+            }
+
+
+
+
+        }
+
+
+    }
+
+
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@Composable
+fun TypesDropdownMenuBox() {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
+
+    val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf(coffeeDrinks[0]) }
+
+    Box(
+        modifier = Modifier
+            .size((screenWidth / 1.8).dp, (screenHeight / 11).dp)
+            .padding(8.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                coffeeDrinks.forEach { item ->
+                    DropdownMenuItem(
+                        text = { androidx.compose.material.Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            expanded = false
+                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@Composable
+fun yearsDropdownMenuBox() {
+    val context = LocalContext.current
+    val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf(coffeeDrinks[0]) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                coffeeDrinks.forEach { item ->
+                    DropdownMenuItem(
+                        text = { androidx.compose.material.Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            expanded = false
+                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
