@@ -1,8 +1,11 @@
 pluginManagement {
     repositories {
+
         gradlePluginPortal()
         google()
         mavenCentral()
+
+
     }
 }
 dependencyResolutionManagement {
@@ -10,6 +13,19 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = "mapbox"
+                password = "sk.eyJ1Ijoia2hhbmgxODAzIiwiYSI6ImNscHVuYzBqaDByaW4yaXJsdW03cHY5aHUifQ.A03ZMFmOOrPCjGTccCkaxQ"
+            }
+
+        }
+
     }
 }
 rootProject.name = "Consume Api Jetpack Compose Tutorial"
