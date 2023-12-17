@@ -67,6 +67,7 @@ import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.GameItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.RentScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.main.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -84,8 +85,6 @@ fun HomeScreen(typeForScreen: String) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-
-
 
     /*
 
@@ -414,21 +413,7 @@ fun ScreenForManager(drawerState: DrawerState,coroutineScope: CoroutineScope,  t
 }
 
 
-@Composable
-fun RentScreen(){
-    val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
-    val vehicles by homeViewModel.vehicles.collectAsState()
 
-    LazyColumn {
-
-        items(vehicles) { vehicle: VehicleItem ->
-
-            VehicleCard(vehicle = vehicle)
-
-        }
-
-    }
-}
 
 @Composable
 fun ManagerVehiclesScreen(){
@@ -493,110 +478,6 @@ fun GameCard(game: GameItem) {
 }
 
 
-@Composable
-fun VehicleCard(vehicle: VehicleItem) {
-
-    val image = rememberImagePainter(data = vehicle.urlImage)
-
-    Card(
-
-        elevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        modifier = Modifier
-            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
-            .fillMaxSize()
-
-    ) {
-
-        Column {
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-            ) {
-                Image(
-                    painter = image,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                )
-
-                var status: String = "Unknown"
-                when(vehicle.status){
-                    "OFF" -> status = "Trống"
-                    "ON" -> status = "Đã thuê"
-                }
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(5.dp)
-                        .size(63.dp, 43.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(
-                            if (vehicle.status == "OFF") Color.Red
-                            else
-                                if (vehicle.status == "ON") Color.Green
-                                else Color.Yellow
-                        )
-                ){
-                    Text(
-                        text = status,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-
-                    )
-                }
-
-            }
-
-            Column(modifier = Modifier.padding(10.dp)) {
-
-                Row(modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween){
-                    Text(text = vehicle.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text(text = vehicle.id, overflow = TextOverflow.Ellipsis)
-
-                }
-
-                Row(modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween){
-                    Text(text = "Loại: " + vehicle.type, maxLines = 2, overflow = TextOverflow.Ellipsis)
-
-                    Text(text = "Năm: "+vehicle.startYearOfUse, overflow = TextOverflow.Ellipsis)
-                    
-                    Button(onClick = { /*TODO*/ },
-                        modifier = Modifier
-
-                        ) {
-
-                        Text(text = "Cho thuê")
-                    }
-
-                }
-
-
-            }
-
-        }
-
-    }
-
-}
 
 private fun prepareNavigationDrawerEmployeeItems(): List<Pair<Int,Pair<NavigationDrawerData,String>>> {
     val typeNavEmployeeOfMenu = arrayOf("navRent","navHistoryRent","navVehRouStats","navLogout")

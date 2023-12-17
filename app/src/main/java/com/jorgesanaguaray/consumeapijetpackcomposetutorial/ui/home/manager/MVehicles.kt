@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
+import android.util.Log
 import android.util.Size
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,6 +48,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -68,6 +70,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,9 +84,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -136,9 +141,9 @@ fun MVehiclesScreen(){
 
         //  nếu isShowNotify true thì hiển thị, false thì không hiển thị
         if(isShowNotifty){
-            CreateVehicleNotify{
+            CreateVehicleCardScreen({
                     isShowNotifty = false
-            }
+            },mVehicleViewModel)
         }
 
     }
@@ -156,7 +161,6 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDe
     val scaffoldState = rememberScaffoldState()
 
     val context = LocalContext.current
-
 
     Card(
 
@@ -205,16 +209,25 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDe
                         modifier = Modifier
                             .size(100.dp,40.dp),
                         onClick = {
-
                         coroutineScope.launch {
-                            // delete vehicle by ID
-                            mVehicleViewModel.deleteVehicleById(vehicle.id.toString())
+                            try{
+                                // delete vehicle by ID
+                                mVehicleViewModel.deleteVehicleById(vehicle.id.toString())
 
-                            Toast.makeText(context, "Xóa thành công ${vehicle.id} ${vehicle.id} ${vehicle.name}", Toast.LENGTH_LONG).show()
-                            // Gọi onDelete callback để cập nhật danh sách
-                            onDelete()
+                                Toast.makeText(context, "Xóa thành công", Toast.LENGTH_LONG).show()
+                                // Gọi onDelete callback để cập nhật danh sách
+                                onDelete()
+
+                            } catch (ex: Exception){
+
+                                Toast.makeText(context, "Xóa Không thành công", Toast.LENGTH_LONG).show()
+
+                                Log.d("MVehicles","Can't delete error:$ex")
+
+                            }
+
+
                         }
-
                     },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
 
@@ -235,10 +248,9 @@ fun VehicleCard(vehicle: VehicleItem, mVehicleViewModel: MVehicleViewModel, onDe
 
 }
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreateVehicleNotify(onCloseClicked: () -> Unit){
+fun CreateVehicleCardScreen(onCloseClicked: () -> Unit,mVehicleViewModel: MVehicleViewModel){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -248,10 +260,18 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
     var tfName by remember { mutableStateOf("") }
     var tfUrlImage by remember { mutableStateOf("") }
 
+    // set gia tri đầu tiên khi tạo form
+    var drmType by remember{ mutableStateOf("Xe ô tô") }
+    var drmYear by remember{ mutableStateOf("2023") }
+
+
     val context = LocalContext.current
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
 
-    var description by remember { mutableStateOf("") }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = remember(lifecycleOwner) { lifecycleOwner.lifecycleScope }
+
+    var imageFileName by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     var bitmap: Bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
@@ -262,19 +282,16 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
             selectedImageUri = uri
             val fileName = getFileNameFromUri(context.contentResolver, uri)
             // Xử lý tên tệp tin ở đây (ví dụ: hiển thị tên tệp tin)
-
             // Đưa file name vào textField Hình ảnh
-            tfUrlImage = fileName
+            // Example: locahost:8080/vehicles/filename
+            tfUrlImage =  "/vehicle/" + fileName
+            imageFileName = fileName
+
         }
     }
 
 
-
-
-
-
-
-    androidx.compose.material3.Card(
+   Card(
         modifier = Modifier
             .size(width = screenWidth.dp - 13.dp, height = (screenHeight / 1.8).dp),
     ) {
@@ -294,7 +311,7 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
                     text = "Thêm phương tiện",
                     fontSize = 21.sp,
                     modifier = Modifier
-                        .padding(8.dp,0.dp,0.dp,0.dp)
+                        .padding(8.dp, 0.dp, 0.dp, 0.dp)
                         .padding(12.dp),
 
                     textAlign = TextAlign.Center,
@@ -371,7 +388,7 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
                 Row(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .padding(8.dp,15.dp,20.dp,8.dp)
+                        .padding(8.dp, 15.dp, 20.dp, 8.dp)
                 ){
 
                     Image(
@@ -380,7 +397,7 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
                         modifier = Modifier
                             .size(50.dp)
                             .clip(MaterialTheme.shapes.medium)
-                            .padding(0.dp,0.dp,0.dp,10.dp)
+                            .padding(0.dp, 0.dp, 0.dp, 10.dp)
                             .clickable {
                                 // Xử lý khi nhấn vào ảnh
                             }
@@ -397,35 +414,55 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
                                 getContent.launch("image/*")
 
                             }
-                            .padding(0.dp,5.dp,0.dp,0.dp)
+                            .padding(0.dp, 5.dp, 0.dp, 0.dp)
                     )
 
                 }
 
-
-
-
             }
 
-
-
-
             Row {
-                TypesDropdownMenuBox()
-                YearsDropdownMenuBox()
+
+                TypesDropdownMenuBox{typeItem ->
+                    drmType = typeItem
+
+                }
+
+                YearsDropdownMenuBox ({ yearItem ->
+                    drmYear = yearItem
+                })
+
             }
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { /*TODO*/
+                    coroutineScope.launch {
+                        try{
+                            val vehicleModel = VehicleModel(tfId, tfName, drmType, drmYear, "OFF", tfUrlImage)
+                            val imageBitMapVehicle = bitmap
+                            // Call the suspend function from the coroutine
+                            // POST Thêm xe
+
+                            mVehicleViewModel.addVehicle(vehicleModel)
+                            // POST Thêm Ảnh
+                            mVehicleViewModel.addImageVehicle(imageBitMapVehicle, imageFileName)
+
+                            Toast.makeText(context,"Thêm thành công",Toast.LENGTH_SHORT).show()
+                        } catch (ex: Exception){
+                            Log.d("MVehicles","can't add vehicle error:$ex")
+                        }
+
+                    }
+
+                          },
+
                 modifier = Modifier
                     .size(screenWidth.dp, (screenHeight / 14).dp)
                     .padding(0.dp, 10.dp, 0.dp, 0.dp)
+
             ) {
                 Text("Thêm",color = Color.White)
             }
-
-
-
 
         }
 
@@ -435,11 +472,9 @@ fun CreateVehicleNotify(onCloseClicked: () -> Unit){
 
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun TypesDropdownMenuBox() {
+fun TypesDropdownMenuBox(getType:(String) -> Unit) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
@@ -449,7 +484,15 @@ fun TypesDropdownMenuBox() {
     val types = arrayOf("Xe ô tô", "Xe tải", "Xe giải trí", "Xe mô tô", "Xe cứu thương","Xe bus",
         "Thuyền","Xe cứu hỏa","Trực thăng","Xe Tank")
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(types[0]) }
+    var selectedText by remember { mutableStateOf(types.first()) }
+
+
+    // Khi giá trị selectedText thay đổi, gọi lambda expression để thông báo giá trị mới
+    DisposableEffect(selectedText) {
+        onDispose {
+            getType(selectedText)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -491,7 +534,7 @@ fun TypesDropdownMenuBox() {
 // DM load cái củ shit này lên 40 mb
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun YearsDropdownMenuBox(viewModel: YourViewModel = viewModel()) {
+fun YearsDropdownMenuBox(getYear:(String) -> Unit, viewModel: YourViewModel = viewModel()) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
@@ -503,6 +546,14 @@ fun YearsDropdownMenuBox(viewModel: YourViewModel = viewModel()) {
 
     var expanded by remember { mutableStateOf(false) }
     var selectedYear by remember { mutableStateOf(years.firstOrNull() ?: 2023) }
+
+    // Truyền giá trị type
+    // Khi giá trị selectedText thay đổi, gọi lambda expression để thông báo giá trị mới
+    DisposableEffect(selectedYear){
+        onDispose {
+            getYear(selectedYear.toString())
+        }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.viewModelScope.launch {
@@ -545,6 +596,31 @@ fun YearsDropdownMenuBox(viewModel: YourViewModel = viewModel()) {
             }
         }
     }
+}
+
+@Composable
+fun ImagePickerIcon(context: Context, onImageSelected: (Uri, String) -> Unit) {
+    val getContent = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            val fileName = getFileNameFromUri(context.contentResolver, uri)
+            onImageSelected(uri, fileName)
+            // Xử lý tên tệp tin ở đây (ví dụ: hiển thị tên tệp tin)
+            println("Selected file name: $fileName")
+        }
+    }
+
+    Icon(
+        imageVector = Icons.Default.AddCircle,
+        contentDescription = null,
+        tint = Color.Black, // Icon color
+        modifier = Modifier
+            .size(45.dp)
+            .clickable {
+                // Gọi getContent khi icon được nhấn
+                getContent.launch("image/*")
+            }
+            .padding(0.dp, 0.dp, 20.dp, 0.dp)
+    )
 }
 class YourViewModel : ViewModel() {
     var _years = MutableStateFlow<List<Int>>(emptyList())
@@ -622,27 +698,4 @@ private fun getFileNameFromUri(contentResolver: ContentResolver, uri: Uri): Stri
     return fileName
 }
 
-@Composable
-fun ImagePickerIcon(context: Context, onImageSelected: (Uri, String) -> Unit) {
-    val getContent = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            val fileName = getFileNameFromUri(context.contentResolver, uri)
-            onImageSelected(uri, fileName)
-            // Xử lý tên tệp tin ở đây (ví dụ: hiển thị tên tệp tin)
-            println("Selected file name: $fileName")
-        }
-    }
 
-    Icon(
-        imageVector = Icons.Default.AddCircle,
-        contentDescription = null,
-        tint = Color.Black, // Icon color
-        modifier = Modifier
-            .size(45.dp)
-            .clickable {
-                // Gọi getContent khi icon được nhấn
-                getContent.launch("image/*")
-            }
-            .padding(0.dp, 0.dp, 20.dp, 0.dp)
-    )
-}

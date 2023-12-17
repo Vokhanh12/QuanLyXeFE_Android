@@ -8,6 +8,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 interface AccountApi {
+    // Đăng nhập
+    // Đưa Username và password kiểm tra có trong csdl thì
     @POST("http://192.168.1.13:8080/api/login")
     suspend fun getTypeByUsernameAndPassword(
         @Body request: LoginRequest
@@ -18,4 +20,5 @@ data class LoginRequest(
     @SerializedName("username") val username: String,
     @SerializedName("password") val password: String
 )
+
 
