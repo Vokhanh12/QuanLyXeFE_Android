@@ -2,11 +2,11 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model
 
 data class VehicleModel(
 
-    val id: String,
-    val name: String,
-    val type: String,
-    val startYearOfUse: String,
-    val status: String,
-    val urlImage: String
+    var id: String,
+    var name: String,
+    var type: String,
+    var startYearOfUse: String,
+    var status: String,
+    var urlImage: String
 
 )
