@@ -1,6 +1,5 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote
 
-import android.graphics.Bitmap
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.VEHICLES_ENDPOINT
 import okhttp3.MultipartBody

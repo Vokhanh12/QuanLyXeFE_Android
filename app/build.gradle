@@ -5,6 +5,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
 
+
 }
 
 android {
@@ -50,6 +51,8 @@ android {
 
         }
     }
+
+
 
     buildFeatures {
         compose true

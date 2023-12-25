@@ -46,8 +46,8 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    //Navigation(homeViewModelFactory)
-                    HomeScreen(typeForScreen = "QL")
+                   //Navigation(homeViewModelFactory)
+                   HomeScreen(typeForScreen = "QL")
                    //mVehiclesScreen()
 
 

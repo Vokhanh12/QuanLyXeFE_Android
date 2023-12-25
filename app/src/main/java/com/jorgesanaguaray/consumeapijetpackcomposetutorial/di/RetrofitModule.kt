@@ -1,10 +1,14 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.di
 
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.AccountApi
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.RouteApi
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.RouteService
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
-import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.LoginAccountsUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetAccountsUseCase
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetRoutesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.AccountRepository
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.RouteRepository
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.repo.VehicleRepository
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeViewModelFactory
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.BASE_URL
@@ -47,6 +51,12 @@ object RetrofitModule {
         return retrofit.create(AccountApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideRouteApi(retrofit: Retrofit): RouteApi {
+        return retrofit.create(RouteApi::class.java)
+    }
+
 
     @Singleton
     @Provides
@@ -57,8 +67,8 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideLoginAccountsUseCase(accountRepository: AccountRepository): LoginAccountsUseCase {
-        return LoginAccountsUseCase(accountRepository)
+    fun provideLoginAccountsUseCase(accountRepository: AccountRepository): GetAccountsUseCase {
+        return GetAccountsUseCase(accountRepository)
     }
 
     @Singleton
@@ -66,6 +76,13 @@ object RetrofitModule {
     fun provideGetVehiclesUseCase(vehicleRepository: VehicleRepository): GetVehiclesUseCase {
         return GetVehiclesUseCase(vehicleRepository)
     }
+
+    @Provides
+    @Singleton
+    fun provideGetRoutesUseCase(routeRepository: RouteRepository): GetRoutesUseCase {
+        return GetRoutesUseCase(routeRepository)
+    }
+
 
 
 }

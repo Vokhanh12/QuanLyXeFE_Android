@@ -33,6 +33,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
@@ -66,8 +68,12 @@ fun RentScreen(){
     val homeViewModel = viewModel(modelClass = RentalViewModel::class.java)
     val vehicles by homeViewModel.vehicles.collectAsState()
 
+    val rentalViewModel: RentalViewModel= hiltViewModel()
+
     var vehicleNameProvider by remember { mutableStateOf("") }
     var vehicleTypeProvider by remember { mutableStateOf("") }
+
+    var nextId by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -81,8 +87,10 @@ fun RentScreen(){
                 VehicleCard({
                     isRentalCardVisible = true
                 },{getName ->
+                    println("get:$getName")
                     vehicleNameProvider = getName
                 },{getType ->
+                    println("get:$getType")
                     vehicleTypeProvider = getType
                 },vehicle = vehicle)
 
@@ -92,9 +100,28 @@ fun RentScreen(){
         }
 
         if(isRentalCardVisible)
-                RentalVehicleCardScreen({
-                    isRentalCardVisible = false
-                }, vehicleNameProvider, vehicleTypeProvider)
+            if(vehicleNameProvider != "" && vehicleTypeProvider != ""){
+                println("Provider:$vehicleNameProvider")
+                println("Provider:$vehicleTypeProvider")
+
+                if (isRentalCardVisible && vehicleNameProvider != "" && vehicleTypeProvider != "") {
+                    println("Provider:$vehicleNameProvider")
+                    println("Provider:$vehicleTypeProvider")
+
+                    LaunchedEffect(rentalViewModel) {
+                        nextId = rentalViewModel.getRouteNextId()
+                    }
+                }
+
+                nextId?.let { id ->
+                    RentalVehicleCardScreen({
+                        isRentalCardVisible = false
+                    }, vehicleNameProvider, vehicleTypeProvider, id)
+                }
+
+
+            }
+
 
 
     }
@@ -112,15 +139,14 @@ fun VehicleCard(onCLickOpened:() -> Unit, getName:(String) -> Unit, getType: (St
     var typeState by remember { mutableStateOf("") }
 
     // Khi giá trị selectedText thay đổi, gọi lambda expression để thông báo giá trị mới
-    DisposableEffect(nameState,typeState) {
-        onDispose {
-            getName(nameState)
-            getType(typeState)
-        }
+    LaunchedEffect(nameState, typeState) {
+        getName(nameState)
+        getType(typeState)
     }
 
 
-        Card(
+
+    Card(
             elevation = 5.dp,
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier
@@ -199,15 +225,17 @@ fun VehicleCard(onCLickOpened:() -> Unit, getName:(String) -> Unit, getType: (St
                         Text(text = "Năm: "+vehicle.startYearOfUse, overflow = TextOverflow.Ellipsis)
 
                         Button(onClick = {
+
+                            println("button:${vehicle.name}")
+                            println("button:${vehicle.type}")
+
                             nameState = vehicle.name
                             typeState = vehicle.type
 
-
-
-                                        // click change is Rental card false or true
-                                        onCLickOpened()
-
-
+                            println("state:${nameState}")
+                            println("state:${typeState}")
+                            // click change is Rental card false or true
+                            onCLickOpened()
 
                         },
                             modifier = Modifier
@@ -227,14 +255,10 @@ fun VehicleCard(onCLickOpened:() -> Unit, getName:(String) -> Unit, getType: (St
         }
 
 
-
-
-
-
 }
 
 @Composable
-fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehicleType: String){
+fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehicleType: String, nextRouteId: String){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -246,7 +270,7 @@ fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehic
     var tfVehicleName by remember{ mutableStateOf(vehicleName) }
     var tfVehicleType by remember{ mutableStateOf(vehicleType) }
 
-    var tfRouteId by remember{ mutableStateOf("") }
+    var tfRouteId by remember{ mutableStateOf(nextRouteId) }
     var tfRouteName by remember{ mutableStateOf("") }
 
     var drmVehicleType by remember { mutableStateOf("") }

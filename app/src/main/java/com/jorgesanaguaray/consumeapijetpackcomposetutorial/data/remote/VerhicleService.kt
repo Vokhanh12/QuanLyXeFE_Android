@@ -3,7 +3,6 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote
 import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,18 +11,11 @@ import javax.inject.Inject
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.result.Result
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.result.Success
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.result.Error
-import okhttp3.MediaType
 import java.io.ByteArrayOutputStream
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
+
 
 class VerhicleService @Inject constructor(private val vehicleApi: VehicleApi) {
 
