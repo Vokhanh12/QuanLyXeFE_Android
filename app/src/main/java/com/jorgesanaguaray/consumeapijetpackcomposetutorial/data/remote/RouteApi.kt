@@ -4,9 +4,10 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.response
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.util.Constants.Companion.VEHICLES_ENDPOINT
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface RouteApi {
-    @GET(VEHICLES_ENDPOINT)
-    suspend fun getNextId(): Response<RouteNextIdResponse>
+    @POST("RoutesVehicle/nextId")
+    suspend fun getNextId(): Response<String>
 
 }

@@ -55,9 +55,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.LocationModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.VehicleModel
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
@@ -70,10 +74,12 @@ fun RentScreen(){
 
     val rentalViewModel: RentalViewModel= hiltViewModel()
 
+
     var vehicleNameProvider by remember { mutableStateOf("") }
     var vehicleTypeProvider by remember { mutableStateOf("") }
 
     var nextId by remember { mutableStateOf<String?>(null) }
+    var arrLocation by remember { mutableStateOf(emptyList<LocationModel>()) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -110,13 +116,14 @@ fun RentScreen(){
 
                     LaunchedEffect(rentalViewModel) {
                         nextId = rentalViewModel.getRouteNextId()
+                        arrLocation = rentalViewModel.getLocations()
                     }
                 }
 
                 nextId?.let { id ->
                     RentalVehicleCardScreen({
                         isRentalCardVisible = false
-                    }, vehicleNameProvider, vehicleTypeProvider, id)
+                    }, vehicleNameProvider, vehicleTypeProvider, id,arrLocation)
                 }
 
 
@@ -258,7 +265,9 @@ fun VehicleCard(onCLickOpened:() -> Unit, getName:(String) -> Unit, getType: (St
 }
 
 @Composable
-fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehicleType: String, nextRouteId: String){
+fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String,
+                            vehicleType: String, nextRouteId: String,
+                            arrLocation: List<LocationModel>){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -289,9 +298,6 @@ fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehic
 
 
     ){
-
-
-
 
             Box{
 
@@ -368,7 +374,7 @@ fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String, vehic
 
                             LocationNameDropdownMenuBox({ itemName ->
                                 drmLocationName = itemName
-                            })
+                            },arrLocation)
 
                             Row{
                                 DateTimePicker("Thời gian bắt đầu")
@@ -487,17 +493,19 @@ fun VehicleTypesDropdownMenuBox(getType:(String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun LocationNameDropdownMenuBox(getName:(String) -> Unit) {
+fun LocationNameDropdownMenuBox(getName:(String) -> Unit, arrLocation: List<LocationModel>) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+
+    val rentalViewModel: RentalViewModel= hiltViewModel()
 
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
 
-    val types = arrayOf("Địa điểm", "Xe tải", "Xe giải trí", "Xe mô tô", "Xe cứu thương","Xe bus",
-        "Thuyền","Xe cứu hỏa","Trực thăng","Xe Tank")
+    val types = arrLocation.map { it.name }.toTypedArray()
+
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(types.first()) }
+    var selectedText by remember { mutableStateOf("Địa điểm") }
 
 
     // Khi giá trị selectedText thay đổi, gọi lambda expression để thông báo giá trị mới
@@ -555,8 +563,13 @@ fun DateTimePicker(text: String){
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
 
+    var currentText by remember{ mutableStateOf(text) }
+
     val calendar = Calendar.getInstance()
     calendar.set(1990, 0, 22) // add year, month (Jan), date
+
+    val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.ROOT)
+
 
     // set the initial date
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = calendar.timeInMillis)
@@ -605,14 +618,17 @@ fun DateTimePicker(text: String){
         shape = RoundedCornerShape(0),
         onClick = {
             showDatePicker = true
+            currentText =  formatter.format(Date(selectedDate))
+
         }
     ) {
-        Text(text = "$text")
+
+        Text(text = "$currentText")
     }
 
     /*
 
-    val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.ROOT)
+
     Text(
         text = "Selected date: ${formatter.format(Date(selectedDate))}"
     )

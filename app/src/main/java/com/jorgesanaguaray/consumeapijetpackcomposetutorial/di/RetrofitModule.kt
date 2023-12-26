@@ -1,6 +1,8 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.di
 
+import com.google.gson.GsonBuilder
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.AccountApi
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.LocationApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.RouteApi
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.RouteService
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.VehicleApi
@@ -18,6 +20,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 /**
@@ -31,13 +34,14 @@ object RetrofitModule {
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit {
+        val gson = GsonBuilder().setLenient().create()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-
     }
+
 
     @Singleton
     @Provides
@@ -55,6 +59,12 @@ object RetrofitModule {
     @Singleton
     fun provideRouteApi(retrofit: Retrofit): RouteApi {
         return retrofit.create(RouteApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationApi(retrofit: Retrofit): LocationApi{
+        return retrofit.create(LocationApi::class.java)
     }
 
 

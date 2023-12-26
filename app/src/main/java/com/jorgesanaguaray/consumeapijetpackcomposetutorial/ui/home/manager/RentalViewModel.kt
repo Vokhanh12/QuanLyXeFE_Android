@@ -2,6 +2,8 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.data.remote.model.LocationModel
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetLocationsUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetRoutesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.GetVehiclesUseCase
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.domain.item.VehicleItem
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RentalViewModel @Inject constructor(private val getVehiclesUseCase: GetVehiclesUseCase,
-                                          private val getRoutesUserCase: GetRoutesUseCase) : ViewModel() {
+                                          private val getRoutesUserCase: GetRoutesUseCase,
+                                          private  val getLocationsUseCase: GetLocationsUseCase) : ViewModel() {
 
     private val _vehicles = MutableStateFlow(emptyList<VehicleItem>())
     val vehicles: StateFlow<List<VehicleItem>> get() = _vehicles
@@ -38,5 +41,10 @@ class RentalViewModel @Inject constructor(private val getVehiclesUseCase: GetVeh
     suspend fun getRouteNextId(): String{
         return getRoutesUserCase.getNextId()
     }
+    suspend fun getLocations(): List<LocationModel>{
+        return getLocationsUseCase.getLocations()
+    }
+
+
 
 }
