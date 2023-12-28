@@ -425,9 +425,6 @@ fun RentalVehicleCardScreen(onCLickClosed: () -> Unit,vehicleName: String,
         }
 
 
-
-
-
 }
 
 
@@ -591,15 +588,16 @@ fun DateTimePicker(text: String){
                 TextButton(onClick = {
                     showDatePicker = false
                     selectedDate = datePickerState.selectedDateMillis!!
+                    currentText =  formatter.format(Date(selectedDate))
                 }) {
-                    Text(text = "Confirm")
+                    Text(text = "Xác nhận")
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showDatePicker = false
                 }) {
-                    Text(text = "Cancel")
+                    Text(text = "Hủy bỏ")
                 }
             }
         ) {
@@ -618,7 +616,6 @@ fun DateTimePicker(text: String){
         shape = RoundedCornerShape(0),
         onClick = {
             showDatePicker = true
-            currentText =  formatter.format(Date(selectedDate))
 
         }
     ) {

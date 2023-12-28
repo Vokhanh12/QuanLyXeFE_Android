@@ -7,9 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val loginAccountsUseCase: GetAccountsUseCase): ViewModel() {
+class LoginViewModel @Inject constructor(private val getAccountsUseCase: GetAccountsUseCase): ViewModel() {
     suspend fun getTypeByUsernameAndPassword(username: String, password: String): AccountItem?{
-        return loginAccountsUseCase.getTypeByUsernameAndPassword(username, password)
+        return getAccountsUseCase.getTypeByUsernameAndPassword(username, password)
     }
 
 }

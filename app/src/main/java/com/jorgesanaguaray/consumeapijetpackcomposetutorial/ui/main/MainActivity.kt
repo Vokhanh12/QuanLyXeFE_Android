@@ -21,6 +21,7 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerLocat
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerRoutesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerVehiclesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MapScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.ConsumeApiJetpackComposeTutorialTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -47,8 +48,9 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                    //Navigation(homeViewModelFactory)
-                   HomeScreen(typeForScreen = "QL")
+                   //HomeScreen(typeForScreen = "QL")
                    //mVehiclesScreen()
+                    MapScreen()
 
 
                 }
