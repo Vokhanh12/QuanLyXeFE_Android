@@ -2,7 +2,6 @@ package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -22,8 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -62,8 +62,13 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.util.lerp
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.DarkModeSwitchTheme
+import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.logo.logo
+
 
 
 @Composable
@@ -71,6 +76,11 @@ fun MapBoxMap(
     modifier: Modifier = Modifier,
     point: Point?,
 ) {
+    val configuration = LocalConfiguration.current
+
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
+
     val context = LocalContext.current
     val originalMarker = remember(context) {
         context.getDrawable(R.drawable.marker)?.toBitmap()
@@ -98,6 +108,10 @@ fun MapBoxMap(
                 MapView(it).also { mapView ->
                     pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
 
+                    mapView.gestures.pitchEnabled = true
+                    mapView.compass.enabled = false
+                    mapView.logo.enabled = false
+
                     if (point != null) {
                         pointAnnotationManager?.let {
                             it.deleteAll()
@@ -108,14 +122,16 @@ fun MapBoxMap(
                             it.create(pointAnnotationOptions)
                             mapView.getMapboxMap()
                                 .flyTo(CameraOptions.Builder().bearing(45.0).zoom(10.0).pitch(50.0).center(point).build())
+
                         }
                     }
+
+
+
                 }
 
             },
             update = { mapView ->
-
-
 
                 mapView.getMapboxMap().loadStyle(Style.STANDARD) { style ->
                     val lightPreset = if (nightMode) "day" else "night"
@@ -125,20 +141,55 @@ fun MapBoxMap(
                 Log.d("MapBoxMap", "Updating map with nightMode: $nightMode")
 
 
-
                 NoOpUpdate
             },
-            modifier = modifier
+
         )
 
         Row {
-
-            DarkModeSwitch{ status ->
-                nightMode = status
-            }
+            Spacer(modifier = Modifier.weight(1f))
+            DarkModeSwitch(
+                getStatus = { status ->
+                    nightMode = status
+                },
+            )
         }
+
+
+
     }
 }
+
+/*
+private fun renderRouteToDestination(){
+    val origin = Point.fromLngLat(106.67992, 10.36076)
+    val destination = Point.fromLngLat(143.152001, -37.260811)
+    val navRoute = NavigationRoute.builder(context)
+        .accessToken(getString(R.string.mapbox_access_token))
+        .origin(origin)
+        .profile(DirectionsCriteria.PROFILE_WALKING)
+        .destination(destination)
+        .build()
+    navRoute.getRoute(object : Callback<DirectionsResponse> {
+        override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {}
+
+        override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
+            val routeResponse = response ?: return
+            val body = routeResponse.body() ?: return
+            if (body.routes().count() == 0){
+                Log.d(TAG, "There were no routes")
+                return
+            }
+            if (navigationMapRoute != null) navigationMapRoute?.updateRouteVisibilityTo(false)
+            navigationMapRoute = NavigationMapRoute(null, mapView!!, mapbox)
+            val directionsRoute = body.routes().first()
+            navigationMapRoute?.addRoute(directionsRoute)
+            Log.d(TAG, "Successful got route to destination")
+        }
+    })
+}
+
+ */
 
 @Composable
 fun MapScreen() {
@@ -154,13 +205,12 @@ fun MapScreen() {
 }
 
 
-
 @Composable
 fun DarkModeSwitch(checked: Boolean, modifier: Modifier, onCheckedChanged: (Boolean) -> Unit) {
 
-    val switchWidth = 160.dp
-    val switchHeight = 64.dp
-    val handleSize = 52.dp
+    val switchWidth = 90.dp
+    val switchHeight = 40.dp
+    val handleSize = 32.dp
     val handlePadding = 10.dp
 
     val valueToOffset = if (checked) 1f else 0f
@@ -242,7 +292,8 @@ fun DarkModeSwitch(checked: Boolean, modifier: Modifier, onCheckedChanged: (Bool
 }
 
 @Composable
-fun DarkModeSwitch(getStatus:(Boolean) -> Unit) {
+fun DarkModeSwitch(
+    getStatus:(Boolean) -> Unit) {
 
     var status by remember { mutableStateOf(true) }
 
@@ -254,8 +305,10 @@ fun DarkModeSwitch(getStatus:(Boolean) -> Unit) {
     }
 
     DarkModeSwitchTheme {
-        Column {
-            DarkModeSwitch(!status, Modifier.padding(24.dp)) { status = !it }
-        }
+            DarkModeSwitch(
+                !status,
+                modifier = Modifier
+                    .padding(10.dp)
+            ) { status = !it }
     }
 }
