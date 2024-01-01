@@ -120,6 +120,8 @@ dependencies {
 
 
     // If you're using compose also add the compose extension
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.8.0'
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:5.8.0")
     implementation("com.mapbox.extension:maps-compose:11.0.0")
     implementation 'com.mapbox.maps:android:11.0.0'
 
@@ -128,6 +130,9 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:2.17.8'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.42.6'
      */
+
+
+
 
     // mapbox Migrate
     implementation("androidx.appcompat:appcompat") {

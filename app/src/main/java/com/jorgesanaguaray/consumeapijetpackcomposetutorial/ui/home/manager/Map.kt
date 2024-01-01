@@ -65,12 +65,18 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.util.lerp
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.DarkModeSwitchTheme
+import com.mapbox.api.directions.v5.DirectionsCriteria
+import com.mapbox.api.directions.v5.MapboxDirections
+import com.mapbox.api.directions.v5.models.DirectionsResponse
+import com.mapbox.api.directions.v5.models.DirectionsRoute
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.logo.logo
-
-
-
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 @Composable
 fun MapBoxMap(
     modifier: Modifier = Modifier,
@@ -160,36 +166,60 @@ fun MapBoxMap(
     }
 }
 
-/*
-private fun renderRouteToDestination(){
-    val origin = Point.fromLngLat(106.67992, 10.36076)
-    val destination = Point.fromLngLat(143.152001, -37.260811)
-    val navRoute = NavigationRoute.builder(context)
-        .accessToken(getString(R.string.mapbox_access_token))
+private fun getRoute(mapBoxMap: MapboxMap, origin: Point, destination: Point){
+
+    val client = MapboxDirections.builder()
         .origin(origin)
-        .profile(DirectionsCriteria.PROFILE_WALKING)
         .destination(destination)
+        .overview(DirectionsCriteria.OVERVIEW_FULL)
+        .profile(DirectionsCriteria.PROFILE_DRIVING)
+        .accessToken(R.string.mapbox_access_token.toString())
         .build()
-    navRoute.getRoute(object : Callback<DirectionsResponse> {
-        override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {}
-
-        override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
-            val routeResponse = response ?: return
-            val body = routeResponse.body() ?: return
-            if (body.routes().count() == 0){
-                Log.d(TAG, "There were no routes")
-                return
+    client.enqueueCall(object : Callback<DirectionsResponse>(){
+        override fun onResponse(
+            call: Call<DirectionsResponse>,
+            response: Response<DirectionsResponse>
+        ) {
+            if(response.body() == null){
+                Log.d("Failure","No routes found, make sure you set the right user and access token")
+                return;
+            } else if(response.body()!!.routes().size < 1){
+                Log.d("Failure", "No routes found")
+                return;
             }
-            if (navigationMapRoute != null) navigationMapRoute?.updateRouteVisibilityTo(false)
-            navigationMapRoute = NavigationMapRoute(null, mapView!!, mapbox)
-            val directionsRoute = body.routes().first()
-            navigationMapRoute?.addRoute(directionsRoute)
-            Log.d(TAG, "Successful got route to destination")
-        }
-    })
-}
 
- */
+            val drivingRoute: DirectionsRoute = response.body()!!.routes().get(0)
+            if(mapBoxMap != null){
+
+                mapBoxMap.getStyle(
+                    object : Style.OnStyleLoaded{
+                        override fun onStyleLoaded(style: Style) {
+                            var routeLineSource = style.getSourceAs<GeoJsonSource>("route-source-id")
+                            var iconGeoJsonSource: GeoJsonSource? = style.getSourceAs<GeoJsonSource>("icon-source-id")
+
+                            if(routeLineSource != null){
+                                routeLineSource.setGeo
+                            }
+
+                        }
+
+                    }
+                )
+
+            }
+
+        }
+
+        override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
+            TODO("Not yet implemented")
+        }
+
+
+    })
+
+
+
+}
 
 @Composable
 fun MapScreen() {
