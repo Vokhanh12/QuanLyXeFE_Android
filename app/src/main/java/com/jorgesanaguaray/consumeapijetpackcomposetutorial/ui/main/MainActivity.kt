@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.R
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.LoginScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.auth.RegisterScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.HomeScreen
@@ -21,8 +22,11 @@ import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerLocat
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerRoutesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.ManagerVehiclesScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MVehiclesScreen
+import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MapBoxMap
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager.MapScreen
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.ConsumeApiJetpackComposeTutorialTheme
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.plugin.Plugin
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -35,6 +39,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         setContent {
 

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Consume Api Jetpack Compose Tutorial</string>
-    <string name="mapbox_access_token">sk.eyJ1Ijoia2hhbmgxODAzIiwiYSI6ImNscHVuYzBqaDByaW4yaXJsdW03cHY5aHUifQ.A03ZMFmOOrPCjGTccCkaxQ</string>
+    <string name="mapbox_access_token">sk.eyJ1Ijoia2hhbmgxODAzIiwiYSI6ImNscXl5cnVvazBvMW4ybG5rYjZvMHd4YnIifQ.dqri8AhZSAyMUz691DlndA</string>
 </resources>

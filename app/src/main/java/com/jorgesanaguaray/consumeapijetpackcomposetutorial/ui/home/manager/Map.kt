@@ -1,5 +1,6 @@
 package com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.home.manager
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.animation.core.tween
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -64,12 +63,18 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.util.lerp
+import androidx.core.content.ContextCompat.getString
 import com.jorgesanaguaray.consumeapijetpackcomposetutorial.ui.theme.DarkModeSwitchTheme
 import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.api.directions.v5.MapboxDirections
 import com.mapbox.api.directions.v5.models.DirectionsResponse
 import com.mapbox.api.directions.v5.models.DirectionsRoute
+import com.mapbox.core.constants.Constants.PRECISION_6
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.LineString
 import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.gestures
@@ -77,6 +82,12 @@ import com.mapbox.maps.plugin.logo.logo
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.mapbox.maps.extension.style.sources.getSource
+import com.mapbox.maps.extension.style.sources.updateGeoJSONSourceFeatures
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+
+
 @Composable
 fun MapBoxMap(
     modifier: Modifier = Modifier,
@@ -107,16 +118,23 @@ fun MapBoxMap(
         mutableStateOf(null)
     }
 
+
+
     Box {
         AndroidView(
             factory = {
 
-                MapView(it).also { mapView ->
+
+
+                MapView(it)
+                    .also { mapView ->
+
                     pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
 
                     mapView.gestures.pitchEnabled = true
                     mapView.compass.enabled = false
                     mapView.logo.enabled = false
+
 
                     if (point != null) {
                         pointAnnotationManager?.let {
@@ -146,6 +164,24 @@ fun MapBoxMap(
 
                 Log.d("MapBoxMap", "Updating map with nightMode: $nightMode")
 
+                val onMapClickListener = object : OnMapClickListener {
+                    override fun onMapClick(point: Point): Boolean {
+                        // Handle the map click event here
+
+                        val destination: Point = Point.fromLngLat(point.latitude(),point.longitude())
+
+                        val latitude = point.latitude()
+                        val longitude = point.longitude()
+
+                        Log.d("Map Click", "Clicked on the map at Lat: $latitude, Lng: $longitude")
+
+                        getRoute(context,mapView.getMapboxMap(), point, destination)
+                        return true
+                    }
+                }
+
+                mapView.getMapboxMap().addOnMapClickListener(onMapClickListener)
+
 
                 NoOpUpdate
             },
@@ -166,22 +202,26 @@ fun MapBoxMap(
     }
 }
 
-private fun getRoute(mapBoxMap: MapboxMap, origin: Point, destination: Point){
+private fun getRoute(context: Context, mapBoxMap: MapboxMap, origin: Point, destination: Point){
+
 
     val client = MapboxDirections.builder()
-        .origin(origin)
-        .destination(destination)
+        .accessToken(getString(context,R.string.mapbox_access_token))
+        .origin(Point.fromLngLat(-122.42,37.78))
+        .destination(Point.fromLngLat(-77.03,38.91))
         .overview(DirectionsCriteria.OVERVIEW_FULL)
         .profile(DirectionsCriteria.PROFILE_DRIVING)
-        .accessToken(R.string.mapbox_access_token.toString())
         .build()
-    client.enqueueCall(object : Callback<DirectionsResponse>(){
+    client.enqueueCall(object : Callback<DirectionsResponse>{
         override fun onResponse(
             call: Call<DirectionsResponse>,
             response: Response<DirectionsResponse>
         ) {
             if(response.body() == null){
                 Log.d("Failure","No routes found, make sure you set the right user and access token")
+                Log.d("API Request", client.cloneCall().request().url.toString())
+                Log.d("API Response", response.toString())
+
                 return;
             } else if(response.body()!!.routes().size < 1){
                 Log.d("Failure", "No routes found")
@@ -195,10 +235,24 @@ private fun getRoute(mapBoxMap: MapboxMap, origin: Point, destination: Point){
                     object : Style.OnStyleLoaded{
                         override fun onStyleLoaded(style: Style) {
                             var routeLineSource = style.getSourceAs<GeoJsonSource>("route-source-id")
-                            var iconGeoJsonSource: GeoJsonSource? = style.getSourceAs<GeoJsonSource>("icon-source-id")
+                            var iconGeoJsonSource = style.getSourceAs<GeoJsonSource>("icon-source-id")
 
-                            if(routeLineSource != null){
-                                routeLineSource.setGeo
+                            if (routeLineSource != null) {
+                                drivingRoute.geometry()?.let { geometry ->
+                                    LineString.fromPolyline(geometry, PRECISION_6)
+                                        .toString()
+                                }?.let { routeLineSource?.data(it) }
+
+                                if (iconGeoJsonSource == null) {
+                                    val crtFeature = Feature.fromGeometry(Point.fromLngLat(destination.longitude(), destination.latitude()))
+                                    iconGeoJsonSource?.feature(crtFeature, "icon-source-id")
+
+                                    // Ép kiểu rõ ràng thành GeoJsonSource
+                                    val geoJsonSource: GeoJsonSource? = iconGeoJsonSource
+                                    geoJsonSource?.let { style.addSource(it) }
+                                } else {
+                                    iconGeoJsonSource?.feature(Feature.fromGeometry(Point.fromLngLat(destination.longitude(), destination.latitude())))
+                                }
                             }
 
                         }
@@ -220,6 +274,8 @@ private fun getRoute(mapBoxMap: MapboxMap, origin: Point, destination: Point){
 
 
 }
+
+
 
 @Composable
 fun MapScreen() {
